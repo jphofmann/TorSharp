@@ -30,6 +30,11 @@ namespace Knapcode.TorSharp.Tools.Tor
             await SendCommandAsync(command);
         }
 
+        public async Task<string> CloseCircuitAsync(string circuitId)
+        {
+            return await SendCommandAsync($"CLOSECIRCUIT {circuitId}");
+        }
+
         public async Task CleanCircuitsAsync()
         {
             await SendCommandAsync("SIGNAL NEWNYM");
@@ -50,6 +55,39 @@ namespace Knapcode.TorSharp.Tools.Tor
             Dispose();
         }
 
+        public async Task<string> GetInfoAsync(string param)
+        {
+            if (_tcpClient == null)
+            {
+                throw new TorControlException("The Tor control client has not connected.");
+            }
+
+            await _writer.WriteLineAsync($"GETINFO {param}");
+            await _writer.FlushAsync();
+
+            var response = await _reader.ReadLineAsync();
+
+            // Handle error response;
+
+            if (!response.StartsWith($"250-{param}") && !response.StartsWith($"250+{param}"))
+                throw new TorControlException($"GETINFO {param} command failed with error: {response}");
+
+            // Handle multi line response.
+
+            if (response.EndsWith("="))
+            {
+                string newLine;
+
+                do
+                {
+                    newLine =  await _reader.ReadLineAsync();
+                    response += Environment.NewLine + newLine;
+                } while (!newLine.Contains("250 OK"));
+            }
+
+            return response;
+        }
+
         private async Task<string> SendCommandAsync(string command)
         {
             if (_tcpClient == null)
@@ -61,6 +99,7 @@ namespace Knapcode.TorSharp.Tools.Tor
             await _writer.FlushAsync();
 
             var response = await _reader.ReadLineAsync();
+            
             if (response != SuccessResponse)
             {
                 throw new TorControlException($"The command to authenticate failed with error: {response}");

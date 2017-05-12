@@ -89,7 +89,37 @@ namespace Knapcode.TorSharp
             {
                 await client.ConnectAsync("localhost", _settings.TorControlPort).ConfigureAwait(false);
                 await client.AuthenticateAsync(_settings.TorControlPassword).ConfigureAwait(false);
-                await client.CleanCircuitsAsync().ConfigureAwait(false);
+                await client.CleanCircuitsAsync();
+            }
+        }
+
+        public async Task<string> GetCircuitStatusAsync()
+        {
+            using (var client = new TorControlClient())
+            {
+                await client.ConnectAsync("localhost", _settings.TorControlPort).ConfigureAwait(false);
+                await client.AuthenticateAsync(_settings.TorControlPassword).ConfigureAwait(false);
+                return await client.GetInfoAsync("circuit-status");
+            }
+        }
+
+        public async Task<string> GetNetworkStatusForORAsync(string orName)
+        {
+            using (var client = new TorControlClient())
+            {
+                await client.ConnectAsync("localhost", _settings.TorControlPort).ConfigureAwait(false);
+                await client.AuthenticateAsync(_settings.TorControlPassword).ConfigureAwait(false);
+                return await client.GetInfoAsync($"ns/name/{orName}");
+            }
+        }
+
+        public async Task<string> CloseCircuitAsync(string circuitId)
+        {
+            using (var client = new TorControlClient())
+            {
+                await client.ConnectAsync("localhost", _settings.TorControlPort).ConfigureAwait(false);
+                await client.AuthenticateAsync(_settings.TorControlPassword).ConfigureAwait(false);
+                return await client.CloseCircuitAsync(circuitId);
             }
         }
 

@@ -44,6 +44,16 @@ namespace Knapcode.TorSharp.Tools.Tor
                 dictionary["StrictNodes"] = (bool)settings.TorStrictNodes ? "1" : "0";
             }
 
+            if (settings.TorNewCircuitPeriod != null)
+            {
+                dictionary["NewCircuitPeriod"] = settings.TorNewCircuitPeriod?.ToString(CultureInfo.InvariantCulture);
+            }
+
+            if (settings.MaxCircuitDirtiness != null)
+            {
+                dictionary["MaxCircuitDirtiness"] = settings.TorNewCircuitPeriod?.ToString(CultureInfo.InvariantCulture);
+            }
+            
             return dictionary;
         }
     }

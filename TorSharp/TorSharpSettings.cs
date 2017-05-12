@@ -45,6 +45,8 @@ namespace Knapcode.TorSharp
         public int TorControlPort { get; set; }
         public string TorExitNodes { get; set; }
         public bool? TorStrictNodes { get; set; }
+        public int? TorNewCircuitPeriod { get; set; }
+        public int? MaxCircuitDirtiness { get; set; }
         public int PrivoxyPort { get; set; }
         public string TorControlPassword { get; set; }
         public string HashedTorControlPassword { get; set; }
